@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { BtnSubmit, TextEn, TextPw } from "@/components/Form";
+import { BtnSubmit, DropdownEn, TextEn, TextPw } from "@/components/Form";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [yr, setYr] = useState("");
   const [user, setUser] = useState("");
   const [pw, setPw] = useState("");
   const [msg, setMsg] = useState("");
@@ -40,6 +41,8 @@ export default function Home() {
 
   }, [])
 
+
+  
   const submitHandler = (e) => {
     e.preventDefault();
     const result = userData.find(u => u.user_name === user && u.pw === pw);
@@ -49,10 +52,12 @@ export default function Home() {
       setPw('');
     } else {
       sessionStorage.setItem('log', 1);
+      sessionStorage.setItem('yr', yr);
       router.push('/dashboard');
     }
-
   };
+
+
 
 
   return (
@@ -65,6 +70,11 @@ export default function Home() {
           <p className="py-2 text-center text-red-500">{msg}</p>
           <form onSubmit={submitHandler}>
             <div className="grid grid-cols-1 gap-4">
+              <DropdownEn Title="Select Option" Id="yr" Change={e => setYr(e.target.value)} Value={yr} >
+                <option value="2018">WGI-2018</option>
+                <option value="2019">WGI-2019</option>
+                <option value="2022">WGI-2022</option>
+              </DropdownEn>
               <TextEn Title="User Name" Id="user" Change={e => setUser(e.target.value)} Value={user} Chr={50} />
               <TextPw Title="Password" Id="pw" Change={e => setPw(e.target.value)} Value={pw} Chr={50} />
             </div>
