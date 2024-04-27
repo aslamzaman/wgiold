@@ -74,6 +74,7 @@ export default function Home() {
                 <option value="2018">WGI-2018</option>
                 <option value="2019">WGI-2019</option>
                 <option value="2022">WGI-2022</option>
+                <option value="2023">WGI-2023</option>
               </DropdownEn>
               <TextEn Title="User Name" Id="user" Change={e => setUser(e.target.value)} Value={user} Chr={50} />
               <TextPw Title="Password" Id="pw" Change={e => setPw(e.target.value)} Value={pw} Chr={50} />

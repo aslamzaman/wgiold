@@ -1,44 +1,49 @@
 import React, { useState } from "react";
 import { TextEn, BtnSubmit, DropdownEn, TextDt, TextNum } from "@/components/Form";
 import { GetRemoteData } from "@/lib/utils/GetRemoteData";
+
+
 const date_format = dt => new Date(dt).toISOString().split('T')[0];
 
 
-const Add = ({ message }) => {
+const Payment = ({ message, id }) => {
     const [customerId, setCustomerId] = useState('');
     const [dt, setDt] = useState('');
-    const [cashtypeId, setCashtypeId] = useState('');
+    const [yr, setYr] = useState('');
+    const [cashTypeId, setCashTypeId] = useState('');
     const [bank, setBank] = useState('');
     const [taka, setTaka] = useState('');
 
+
     const [show, setShow] = useState(false);
-    const [customers, setCustomers] = useState([]);
-    const [cashtypes, setCashtypes] = useState([]);
+    const [cashTypes, setCashtypes] = useState([]);
 
 
 
     const resetVariables = () => {
-        setCustomerId('');
+        const sessionYr = sessionStorage.getItem('yr');
+        setCustomerId(id);
         setDt(date_format(new Date()));
-        setCashtypeId('');
+        setYr(sessionYr);
+        setCashTypeId('');
         setBank('');
         setTaka('');
     }
+
 
 
     const showAddForm = async () => {
         setShow(true);
         resetVariables();
         try {
-            const responseCustomer = await GetRemoteData('customer');
-            setCustomers(responseCustomer);
-            const responseCashtype = await GetRemoteData('cashtype');
+            const responseCashtype = await GetRemoteData('cashType');
             setCashtypes(responseCashtype);
         } catch (error) {
             console.error('Failed to fetch delivery data:', error);
         }
-
     }
+
+
 
 
     const closeAddForm = () => {
@@ -50,17 +55,20 @@ const Add = ({ message }) => {
         return {
             customerId: customerId,
             dt: dt,
-            cashtypeId: cashtypeId,
+            yr: yr,
+            cashTypeId: cashTypeId,
             bank: bank,
             taka: taka
         }
     }
 
 
+
     const saveHandler = async (e) => {
         e.preventDefault();
         try {
             const newObject = createObject();
+            console.log(newObject)
             const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment`;
             const requestOptions = {
                 method: "POST",
@@ -82,6 +90,9 @@ const Add = ({ message }) => {
     }
 
 
+
+
+
     return (
         <>
             {show && (
@@ -98,15 +109,14 @@ const Add = ({ message }) => {
                         <div className="px-6 pb-6 text-black">
                             <form onSubmit={saveHandler}>
                                 <div className="grid grid-cols-1 gap-4 my-4">
-                                    <DropdownEn Title="Customer" Id="customerId" Change={e => setCustomerId(e.target.value)} Value={customerId}>
-                                        {customers.length ? customers.map(customer => <option value={customer._id} key={customer._id}>{customer.name}</option>) : null}
-                                    </DropdownEn>
+
                                     <TextDt Title="Date" Id="dt" Change={e => setDt(e.target.value)} Value={dt} />
 
-                                    <DropdownEn Title="Cashtype" Id="cashtypeId" Change={e => setCashtypeId(e.target.value)} Value={cashtypeId}>
-                                        {cashtypes.length ? cashtypes.map(cashtype => <option value={cashtype._id} key={cashtype._id}>{cashtype.name}</option>) : null}
+                                    <DropdownEn Title="Cashtype" Id="cashTypeId" Change={e => setCashTypeId(e.target.value)} Value={cashTypeId}>
+                                        {cashTypes.length ? cashTypes.map(cashType => <option value={cashType._id} key={cashType._id}>{cashType.name}</option>) : null}
                                     </DropdownEn>
-                                    <TextEn Title="Bank" Id="bank" Change={e => setBank(e.target.value)} Value={bank} Chr={150} />
+
+                                    <TextEn Title="Bank" Id="bank" Change={e => setBank(e.target.value)} Value={bank} Chr={50} />
                                     <TextNum Title="Taka" Id="taka" Change={e => setTaka(e.target.value)} Value={taka} />
                                 </div>
                                 <div className="w-full flex justify-start">
@@ -118,13 +128,21 @@ const Add = ({ message }) => {
                     </div>
                 </div>
             )}
-            <button onClick={showAddForm} className="px-1 py-1 bg-blue-500 hover:bg-blue-700 rounded-md transition duration-500" title="Add New">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="3" stroke="currentColor" className="w-7 h-7 stroke-white hover:stroke-gray-100">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+
+            <button onClick={showAddForm} className="w-7 h-7 flex justify-center items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
+                    <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
+                    <path d="M12 6V18" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M15 9.5C15 8.11929 13.6569 7 12 7C10.3431 7 9 8.11929 9 9.5C9 10.8807 10.3431 12 12 12C13.6569 12 15 13.1193 15 14.5C15 15.8807 13.6569 17 12 17C10.3431 17 9 15.8807 9 14.5" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
             </button>
+
+
+
+
+
         </>
     )
 }
-export default Add;
+export default Payment;
 

@@ -1,4 +1,4 @@
-   
+ import Layout from "@/components/Layout"  
     
 export const metadata = {
   title: 'Payment',
@@ -7,6 +7,6 @@ export const metadata = {
 
 
 export default function PaymentLayout({ children }) {
-    return <>{children}</>  
+    return <Layout>{children}</Layout>  
 }
 

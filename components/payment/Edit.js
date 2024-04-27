@@ -1,39 +1,26 @@
 import React, { useState } from "react";
-import { TextEn, BtnSubmit, DropdownEn, TextDt, TextNum } from "@/components/Form";
-import { GetRemoteData } from "@/lib/utils/GetRemoteData";
-const date_format = dt => new Date(dt).toISOString().split('T')[0];
-
+import { TextEn, BtnSubmit } from "@/components/Form";
 
 
 const Edit = ({ message, id, data }) => {
     const [customerId, setCustomerId] = useState('');
     const [dt, setDt] = useState('');
-    const [cashtypeId, setCashtypeId] = useState('');
+    const [yr, setYr] = useState('');
+    const [cashTypeId, setCashTypeId] = useState('');
     const [bank, setBank] = useState('');
     const [taka, setTaka] = useState('');
     const [show, setShow] = useState(false);
 
-    const [customers, setCustomers] = useState([]);
-    const [cashtypes, setCashtypes] = useState([]);
 
-
-    const showEditForm = async () => {
+    const showEditForm = () => {
         setShow(true);
-        try {
-            const responseCustomer = await GetRemoteData('customer');
-            setCustomers(responseCustomer);
-            const responseCashtype = await GetRemoteData('cashtype');
-            setCashtypes(responseCashtype);
-
-            const { customerId, dt, cashtypeId, bank, taka } = data.find(payment => payment._id === id) || { customerId: '', dt: '', cashtypeId: '', bank: '', taka: '' };
-            setCustomerId(customerId._id);
-            setDt(date_format(dt));
-            setCashtypeId(cashtypeId._id);
-            setBank(bank);
-            setTaka(taka);
-        } catch (error) {
-            console.error('Failed to fetch delivery data:', error);
-        }
+        const { customerId, dt, yr, cashTypeId, bank, taka } = data.find(payment => payment._id === id) || { customerId: '', dt: '', yr: '', cashTypeId: '', bank: '', taka: '' };
+        setCustomerId(customerId);
+        setDt(dt);
+        setYr(yr);
+        setCashTypeId(cashTypeId);
+        setBank(bank);
+        setTaka(taka);
     };
 
 
@@ -46,7 +33,8 @@ const Edit = ({ message, id, data }) => {
         return {
             customerId: customerId,
             dt: dt,
-            cashtypeId: cashtypeId,
+            yr: yr,
+            cashTypeId: cashTypeId,
             bank: bank,
             taka: taka
         }
@@ -96,16 +84,12 @@ const Edit = ({ message, id, data }) => {
                         <div className="px-6 pb-6 text-black">
                             <form onSubmit={saveHandler} >
                                 <div className="grid grid-cols-1 gap-4 my-4">
-                                    <DropdownEn Title="Customer" Id="customerId" Change={e => setCustomerId(e.target.value)} Value={customerId}>
-                                        {customers.length ? customers.map(customer => <option value={customer._id} key={customer._id}>{customer.name}</option>) : null}
-                                    </DropdownEn>
-                                    <TextDt Title="Date" Id="dt" Change={e => setDt(e.target.value)} Value={dt} />
-
-                                    <DropdownEn Title="Cashtype" Id="cashtypeId" Change={e => setCashtypeId(e.target.value)} Value={cashtypeId}>
-                                        {cashtypes.length ? cashtypes.map(cashtype => <option value={cashtype._id} key={cashtype._id}>{cashtype.name}</option>) : null}
-                                    </DropdownEn>
-                                    <TextEn Title="Bank" Id="bank" Change={e => setBank(e.target.value)} Value={bank} Chr={150} />
-                                    <TextNum Title="Taka" Id="taka" Change={e => setTaka(e.target.value)} Value={taka} />
+                                    <TextEn Title="Customerid" Id="customerId" Change={e => setCustomerId(e.target.value)} Value={customerId} Chr={50} />
+                                    <TextEn Title="Dt" Id="dt" Change={e => setDt(e.target.value)} Value={dt} Chr={50} />
+                                    <TextEn Title="Yr" Id="yr" Change={e => setYr(e.target.value)} Value={yr} Chr={50} />
+                                    <TextEn Title="Cashtypeid" Id="cashTypeId" Change={e => setCashTypeId(e.target.value)} Value={cashTypeId} Chr={50} />
+                                    <TextEn Title="Bank" Id="bank" Change={e => setBank(e.target.value)} Value={bank} Chr={50} />
+                                    <TextEn Title="Taka" Id="taka" Change={e => setTaka(e.target.value)} Value={taka} Chr={50} />
                                 </div>
                                 <div className="w-full flex justify-start">
                                     <input type="button" onClick={closeEditForm} value="Close" className="bg-pink-600 hover:bg-pink-800 text-white text-center mt-3 mx-0.5 px-4 py-2 font-semibold rounded-md focus:ring-1 ring-blue-200 ring-offset-2 duration-300 cursor-pointer" />
@@ -120,7 +104,13 @@ const Edit = ({ message, id, data }) => {
             )}
             <button onClick={showEditForm} title="Edit" className="px-1 py-1 hover:bg-teal-300 rounded-md transition duration-500">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 stroke-black hover:stroke-blue-800 transition duration-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.54504 12.5H21.705" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.54504 6.5H21.705" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.54504 18.5H21.705" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.29504 7.5C3.84733 7.5 4.29504 7.05228 4.29504 6.5C4.29504 5.94772 3.84733 5.5 3.29504 5.5C2.74276 5.5 2.29504 5.94772 2.29504 6.5C2.29504 7.05228 2.74276 7.5 3.29504 7.5Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.29504 13.5C3.84733 13.5 4.29504 13.0523 4.29504 12.5C4.29504 11.9477 3.84733 11.5 3.29504 11.5C2.74276 11.5 2.29504 11.9477 2.29504 12.5C2.29504 13.0523 2.74276 13.5 3.29504 13.5Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.29504 19.5C3.84733 19.5 4.29504 19.0523 4.29504 18.5C4.29504 17.9477 3.84733 17.5 3.29504 17.5C2.74276 17.5 2.29504 17.9477 2.29504 18.5C2.29504 19.0523 2.74276 19.5 3.29504 19.5Z" />
+
                 </svg>
             </button>
         </>
