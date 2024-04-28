@@ -156,7 +156,7 @@ const Payment = ({ message, id }) => {
                 </div>
             )}
 
-            <button onClick={showAddForm} className="w-7 h-7 flex justify-center items-center">
+            <button onClick={showAddForm} title="Payments" className="w-7 h-7 flex justify-center items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                     <circle cx="12" cy="12" r="10" strokeWidth="1.5" />
                     <path d="M12 6V18" strokeWidth="1.5" strokeLinecap="round" />

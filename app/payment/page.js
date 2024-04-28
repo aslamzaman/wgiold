@@ -122,7 +122,7 @@ const Payment = () => {
     return (
         <>
             <div className="w-full mb-3 mt-8">
-                <h1 className="w-full text-xl lg:text-3xl font-bold text-center text-blue-700">Payment</h1>
+                <h1 className="w-full text-xl lg:text-3xl font-bold text-center text-blue-700">Money Receipt</h1>
                 <h1 className="w-full text-xl lg:text-2xl font-bold text-center text-gray-400">Total = {numberWithComma(parseFloat(total))}/-</h1>
 
                 <p className="w-full text-center text-blue-300">&nbsp;{waitMsg}&nbsp;</p>
@@ -155,7 +155,7 @@ const Payment = () => {
                                         <td className="text-center py-2 px-4">{payment.taka}</td>
                                         <td className="h-8 flex justify-end items-center space-x-1 mt-1 mr-2">
 
-                                            <button onClick={() => printMoneReceipt(payment._id)} title="Edit" className="px-1 py-1 hover:bg-teal-300 rounded-md transition duration-500">
+                                            <button onClick={() => printMoneReceipt(payment._id)} title="Receipt" className="px-1 py-1 hover:bg-teal-300 rounded-md transition duration-500">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 stroke-black hover:stroke-blue-800 transition duration-500">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.54504 12.5H21.705" />
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.54504 6.5H21.705" />

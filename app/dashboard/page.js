@@ -12,7 +12,7 @@ import { numberWithComma } from "@/lib/NumberWithComma";
 const Dashboard = () => {
     const [waitMsg, setWaitMsg] = useState("");
     const [total, setTotal] = useState('0');
-    
+
 
     useEffect(() => {
 
@@ -65,7 +65,7 @@ const Dashboard = () => {
                     cashType = wgi2023.payment_type
                 }
 
-     
+
                 console.log("Length (c, s, p)", customerData.length, saleData.length, paymentData.length);
 
                 const result = customerData.map(customer => {
@@ -89,7 +89,7 @@ const Dashboard = () => {
                     .sort((a, b) => (a.name).toUpperCase() < (b.name).toUpperCase() ? -1 : 1);
 
                 console.log(result);
-                const totaDuesGt = result.reduce((t,c)=>t + parseFloat(c.balance),0);
+                const totaDuesGt = result.reduce((t, c) => t + parseFloat(c.balance), 0);
                 setTotal(totaDuesGt);
                 setWaitMsg(`WGI-${yr}`);
             } catch (error) {
@@ -105,14 +105,12 @@ const Dashboard = () => {
 
 
     return (
-        <div className="w-screen h-screen flex justify-center items-center">
-            <div>
-            <h1 className="w-full text-xl lg:text-5xl font-bold text-center text-blue-700">{waitMsg}</h1>
-            <div className="w-60 h-[3px] mx-auto my-2 bg-gray-400"></div>
-            <h2 className="w-full text-xl lg:text-4xl font-bold text-center text-red-700">Total Duse = {numberWithComma(parseFloat(total))}/-</h2>
+            <div className="w-9/12 lg:w-1/2 mx-auto mt-20 py-10 bg-gray-50 border rounded-lg shadow-lg">
+                <h1 className="w-full text-xl lg:text-5xl font-bold text-center text-blue-700">{waitMsg}</h1>
+                <div className="w-60 h-[3px] mx-auto my-2 bg-gray-400"></div>
+                <h2 className="w-full text-xl lg:text-4xl font-bold text-center text-red-700">Total Duse = {numberWithComma(parseFloat(total))}/-</h2>
             </div>
-
-        </div>
+       
     );
 
 };
