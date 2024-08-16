@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { BtnSubmit, DropdownEn, TextEn, TextPw } from "@/components/Form";
 import { useRouter } from "next/navigation";
 
+
+
 export default function Home() {
   const [yr, setYr] = useState("");
   const [user, setUser] = useState("");
@@ -39,10 +41,11 @@ export default function Home() {
     }
     loadUser();
 
+
   }, [])
 
 
-  
+
   const submitHandler = (e) => {
     e.preventDefault();
     const result = userData.find(u => u.user_name === user && u.pw === pw);

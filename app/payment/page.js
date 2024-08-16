@@ -1,18 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Delete from "@/components/payment/Delete";
+import { compile } from "@/lib/compile";
+import { fetchDataFromAPI, formatedDate, formatedDateDot, inwordEnglish, numberWithComma } from "@/lib/utils";
 
-import { wgi2018 } from "@/lib/wgi2018-formatter";
-import { wgi2019 } from "@/lib/wgi2019-formatter";
-import { wgi2022 } from "@/lib/wgi2022-formatter";
-import { wgi2023 } from "@/lib/wgi2023-formatter";
-import { GetRemoteData } from "@/lib/utils/GetRemoteData";
-const date_format = dt => new Date(dt).toISOString().split('T')[0];
+
 import { jsPDF } from "jspdf";
 require("@/lib/fonts/Poppins-Bold-normal");
 require("@/lib/fonts/Poppins-Regular-normal");
-import { inword } from "@/lib/Inword";
-import { numberWithComma } from "@/lib/NumberWithComma";
 
 
 const Payment = () => {
@@ -25,39 +20,27 @@ const Payment = () => {
     useEffect(() => {
         const getData = async () => {
             setWaitMsg('Please Wait...');
-            const yr = sessionStorage.getItem('yr');
-
-            let customerData = '';
-            if (yr === '2018') {
-                customerData = wgi2018.customer;
-            } else if (yr === '2019') {
-                customerData = wgi2019.customer;
-            } else if (yr === '2022') {
-                customerData = wgi2022.customer;
-            } else {
-                customerData = wgi2023.customer;
-            }
-
-
             try {
-                const responsePayment = await GetRemoteData('payment');
+                const yr = sessionStorage.getItem('yr');
+                const responsePayment = await fetchDataFromAPI(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payment`);
+                const responseData = await compile();
 
-                const result = responsePayment
-                    .filter(payment => parseInt(payment.yr) === parseInt(yr))
-                    .map(payment => {
-                        const matchCustomer = customerData.find(customer => parseInt(customer.id) === parseInt(payment.customerId));
-                        return {
-                            ...payment,
-                            customer: matchCustomer ? matchCustomer : null
-                        }
-                    })
+                const paymentData = responsePayment.filter(payment => parseInt(payment.yr) === parseInt(yr));
 
-                console.log(result);
-                const totalPayment = result.reduce((t, c) => t + parseFloat(c.taka),0);
-                setTotal(totalPayment);
+                const result = paymentData.map(payment => {
+                    const matchCustomer = responseData.data.find(customer => parseInt(customer.id) === parseInt(payment.customerId));
+                    return {
+                        ...payment,
+                        customer: matchCustomer
+                    }
+                });
 
-                setPayments(result);
+
+                const sortResult = result.sort((a, b) => a._id < b._id ? 1 : -1);
+                console.log(sortResult);
+                setPayments(sortResult);
                 setWaitMsg('');
+
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -74,13 +57,9 @@ const Payment = () => {
 
 
     const printMoneReceipt = (id) => {
-        console.log(id);
-
         setWaitMsg('Please Wait...');
         setTimeout(() => {
             const receipt = payments.find(receipt => receipt._id === id);
-            console.log(receipt);
-
             const doc = new jsPDF({
                 orientation: "p",
                 unit: "mm",
@@ -88,6 +67,7 @@ const Payment = () => {
                 putOnlyUsedFonts: true,
                 floatPrecision: 16
             });
+
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -99,19 +79,19 @@ const Payment = () => {
             } else {
                 doc.addImage("/images/moneyreceipt_bank.png", "PNG", 0, 0, pageWidth, pageHeight);
                 doc.text(`${receipt.chequeNo}`, 110, 99, null, null, "center");
-                doc.text(`${date_format(receipt.chequeDt)}`, 170, 99, null, null, "center");
+                doc.text(`${formatedDateDot(receipt.chequeDt,true)}`, 170, 99, null, null, "center");
                 doc.text(`${receipt.bank}`, 105, 109, null, null, "center");
             }
-            doc.text(`${date_format(receipt.dt)}`, 165, 70.5, null, null, "left");
+            doc.text(`${formatedDateDot(receipt.dt,true)}`, 165, 70.5, null, null, "left");
             doc.text(`${receipt.receiveNo}`, 45, 70, null, null, "left");
             doc.text(`${receipt.customer.name}`, 130, 79, null, null, "center");
-            doc.text(`${(inword(receipt.taka)).toUpperCase()}TAKA ONLY`, 105, 89, null, null, "center");
+            doc.text(`${(inwordEnglish(receipt.taka)).toUpperCase()}TAKA ONLY`, 105, 89, null, null, "center");
             doc.text("Dues payment", 95, 119, null, null, "center");
             doc.text(`${receipt.customer.contact}`, 172, 119, null, null, "center");
 
             doc.text(`${parseInt(receipt.taka).toLocaleString('en-IN')}/-`, 70, 131, null, null, "right");
 
-            doc.save(`Money_Receipt_${receipt.receiveNo}_Created_${date_format(new Date())}.pdf`);
+            doc.save(`Money_Receipt_${receipt.receiveNo}_Created_${formatedDate(new Date())}.pdf`);
             setWaitMsg('');
         }, 0);
 
@@ -123,8 +103,6 @@ const Payment = () => {
         <>
             <div className="w-full mb-3 mt-8">
                 <h1 className="w-full text-xl lg:text-3xl font-bold text-center text-blue-700">Money Receipt</h1>
-                <h1 className="w-full text-xl lg:text-2xl font-bold text-center text-gray-400">Total = {numberWithComma(parseFloat(total))}/-</h1>
-
                 <p className="w-full text-center text-blue-300">&nbsp;{waitMsg}&nbsp;</p>
             </div>
             <div className="px-4 lg:px-6">
@@ -133,7 +111,7 @@ const Payment = () => {
                     <table className="w-full border border-gray-200">
                         <thead>
                             <tr className="w-full bg-gray-200">
-                                <th className="text-center border-b border-gray-200 px-4 py-2">Customer</th>
+                                <th className="text-start border-b border-gray-200 px-4 py-2 indent-2">Customer</th>
                                 <th className="text-center border-b border-gray-200 px-4 py-2">Receipt</th>
                                 <th className="text-center border-b border-gray-200 px-4 py-2">Date</th>
                                 <th className="text-center border-b border-gray-200 px-4 py-2">Type</th>
@@ -148,9 +126,9 @@ const Payment = () => {
                             {payments.length ? (
                                 payments.map(payment => (
                                     <tr className="border-b border-gray-200 hover:bg-gray-100" key={payment._id}>
-                                        <td className="text-center py-2 px-4">{payment.customer ? payment.customer.name : 'Error'}</td>
+                                        <td className="text-start py-2 px-4 indent-2">{payment.customer ? payment.customer.name : 'Error'}</td>
                                         <td className="text-center py-2 px-4">{payment.receiveNo}</td>
-                                        <td className="text-center py-2 px-4">{date_format(payment.dt)}</td>
+                                        <td className="text-center py-2 px-4">{formatedDate(payment.dt)}</td>
                                         <td className="text-center py-2 px-4">{payment.cashTypeId.name}</td>
                                         <td className="text-center py-2 px-4">{payment.taka}</td>
                                         <td className="h-8 flex justify-end items-center space-x-1 mt-1 mr-2">

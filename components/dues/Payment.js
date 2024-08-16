@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { TextEn, BtnSubmit, DropdownEn, TextDt, TextNum } from "@/components/Form";
-import { GetRemoteData } from "@/lib/utils/GetRemoteData";
+import { fetchDataFromAPI, formatedDate, postDataToAPI } from "@/lib/utils";
 
-
-const date_format = dt => new Date(dt).toISOString().split('T')[0];
 
 
 const Payment = ({ message, id }) => {
@@ -20,19 +18,20 @@ const Payment = ({ message, id }) => {
 
     const [show, setShow] = useState(false);
     const [cashTypes, setCashtypes] = useState([]);
-
     const [bankShow, setBankShow] = useState(false);
+
+
 
     const resetVariables = () => {
         const sessionYr = sessionStorage.getItem('yr');
         setCustomerId(id);
         setReceiveNo(Math.round(Date.now() / 60000));
-        setDt(date_format(new Date()));
+        setDt(formatedDate(new Date()));
         setYr(sessionYr);
         setCashTypeId('');
         setBank('');
         setChequeNo('');
-        setChequeDt(date_format(new Date()));
+        setChequeDt(formatedDate(new Date()));
         setTaka('');
         //--------------------------------------
         setBankShow(false);
@@ -44,13 +43,12 @@ const Payment = ({ message, id }) => {
         setShow(true);
         resetVariables();
         try {
-            const responseCashtype = await GetRemoteData('cashType');
+            const responseCashtype = await fetchDataFromAPI(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cashType`);
             setCashtypes(responseCashtype);
         } catch (error) {
             console.error('Failed to fetch delivery data:', error);
         }
     }
-
 
 
 
@@ -78,19 +76,8 @@ const Payment = ({ message, id }) => {
         e.preventDefault();
         try {
             const newObject = createObject();
-            console.log(newObject)
-            const apiUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment`;
-            const requestOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newObject)
-            };
-            const response = await fetch(apiUrl, requestOptions);
-            if (response.ok) {
-                message(`Payment is created at ${new Date().toISOString()}`);
-            } else {
-                throw new Error("Failed to create payment");
-            }
+            const msg = await postDataToAPI(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payment`, newObject);
+            message(msg);
         } catch (error) {
             console.error("Error saving payment data:", error);
             message("Error saving payment data.");
@@ -100,18 +87,19 @@ const Payment = ({ message, id }) => {
     }
 
 
+    
     const cashTypeHandler = (e) => {
         const event = e.target.value;
         setCashTypeId(event);
         if (event === '65ede63629c4f0b23474c123') {
             setBankShow(true);
             setBank('');
-            setChequeDt(date_format(new Date()));
+            setChequeDt(formatedDate(new Date()));
             setChequeNo('');
         } else {
             setBankShow(false);
             setBank(' ');
-            setChequeDt(date_format(new Date()));
+            setChequeDt(formatedDate(new Date()));
             setChequeNo(' ');
         }
     }
