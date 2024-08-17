@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Delete from "@/components/payment/Delete";
+import Delete from "@/components/receipt/Delete";
 import { compile } from "@/lib/compile";
 import { fetchDataFromAPI, formatedDate, formatedDateDot, inwordEnglish, numberWithComma } from "@/lib/utils";
 
@@ -15,13 +15,14 @@ const Payment = () => {
     const [msg, setMsg] = useState("Data ready");
     const [waitMsg, setWaitMsg] = useState("");
 
-    const [total, setTotal] = useState('000');
+    const [yr, setYr] = useState('000');
 
     useEffect(() => {
         const getData = async () => {
             setWaitMsg('Please Wait...');
             try {
                 const yr = sessionStorage.getItem('yr');
+                setYr(yr);
                 const responsePayment = await fetchDataFromAPI(`${process.env.NEXT_PUBLIC_BASE_URL}/api/payment`);
                 const responseData = await compile();
 
@@ -102,7 +103,7 @@ const Payment = () => {
     return (
         <>
             <div className="w-full mb-3 mt-8">
-                <h1 className="w-full text-xl lg:text-3xl font-bold text-center text-blue-700">Money Receipt</h1>
+                <h1 className="w-full text-xl lg:text-3xl font-bold text-center text-blue-700">Money Receipt - {yr}</h1>
                 <p className="w-full text-center text-blue-300">&nbsp;{waitMsg}&nbsp;</p>
             </div>
             <div className="px-4 lg:px-6">
